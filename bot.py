@@ -9,13 +9,28 @@ from game import Game
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 PREFIX = '!'
+SWITCH = True
 TIMEOUT_INTERVAL = 15
 
 bot = commands.Bot(command_prefix = PREFIX)
 t = time.time()
 game = Game()
-game.seed(int(time.time()))
+
+seed = int(time.time())
+game.seed(seed)
 game_done = True
+
+def beautify(string, switch):
+    if not switch:
+        return string
+
+    string = string.replace("T ", "10 ")
+    string = string.replace("C ", ":clubs: ")
+    string = string.replace("H ", ":hearts: ")
+    string = string.replace("S ", ":spades: ")
+    string = string.replace("D ", ":diamonds: ")
+    return string
+
 
 @bot.event
 async def on_ready():
@@ -29,6 +44,7 @@ async def play(ctx, arg : str):
         game_done = False
         state = game.reset()
         render_string = game.render(mode='ansi')
+        render_string = beautify(render_string, switch=SWITCH)
         await ctx.send(render_string)
 
         return
@@ -47,11 +63,23 @@ async def play(ctx, arg : str):
 
     state, reward, game_done, _ = game.step(action)
     render_string = game.render(mode='ansi')
+    render_string = beautify(render_string, switch=SWITCH)
 
     await ctx.send(render_string)
 
 @bot.command(name='rules')
 async def rules(ctx):
     await ctx.send('Not implemented')
+
+@bot.command(name='switch')
+async def switch_suits(ctx):
+    global SWITCH
+    if SWITCH:
+        response = 'Removing stickers'
+    else:
+        response = 'Adding stickers'
+
+    SWITCH = not SWITCH
+    await ctx.send(response)
 
 bot.run(TOKEN)

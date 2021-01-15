@@ -3,10 +3,10 @@ import random
 from os import system, name
 
 DECK = [
-        'AS', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', 'TS', 'JS', 'QS', 'KS'
-        'AH', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', 'TH', 'JH', 'QH', 'KH'
-        'AC', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', 'TC', 'JC', 'QC', 'KC'
-        'AD', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD'
+        'AS', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', 'TS', 'JS', 'QS', 'KS',
+        'AH', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', 'TH', 'JH', 'QH', 'KH',
+        'AC', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', 'TC', 'JC', 'QC', 'KC',
+        'AD', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD',
         ]
 
 def card_value(card):
@@ -52,14 +52,14 @@ class Game(gym.Env):
         hand.append(card)
 
         score = 0
-        ace = True
+        ace = False
         usable_ace = False
         for card in hand:
             value = card_value(card)
             score += value
 
             if value == 1:
-                usable_ace = True
+                ace = True
 
         if ace and score <= 11:
             usable_ace = True
@@ -101,11 +101,12 @@ class Game(gym.Env):
         self.deck = DECK
         self.dealer = list()
         self.player = list()
-        self.dealer_score = 0
+        self.player_score = 0
         self.dealer_score = 0
         self.deck_index = 0
         self.done = False
 
+        random.shuffle(self.deck)
         self.__deal(player=True)
         self.__deal(player=True)
         self.__deal(player=False)
@@ -146,6 +147,7 @@ class Game(gym.Env):
         return
 
     def seed(self, seed=None):
-        self.seed = seed
-        random.seed(seed)
-        return seed
+        if seed != None:
+            self.seed = seed
+            random.seed(seed)
+        return self.seed
